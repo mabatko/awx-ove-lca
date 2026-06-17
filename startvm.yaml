@@ -2,14 +2,16 @@
 - name: Start OpenShift VM
   hosts: localhost
   gather_facts: false
+  vars:
+    vm_namespace: default
 
   tasks:
     - name: Start VirtualMachine
       ansible.builtin.uri:
-        url: "{{ api_endpoint }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/start"
+        url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/start"
         method: PUT
         headers:
-          Authorization: "Bearer {{ cso_token }}"
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
           Content-Type: "application/json"
         validate_certs: false
         return_content: true
