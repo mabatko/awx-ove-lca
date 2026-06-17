@@ -1,0 +1,24 @@
+---
+- name: Start OpenShift VM
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Start VirtualMachine
+      ansible.builtin.uri:
+        url: "{{ api_endpoint }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/start"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ cso_token }}"
+          Content-Type: "application/json"
+        validate_certs: false
+        return_content: true
+        status_code:
+          - 200
+          - 202
+          - 204
+      register: vm_start_result
+
+    - name: Show start result
+      ansible.builtin.debug:
+        var: vm_start_result
