@@ -10,6 +10,14 @@
     - name: print token
       debug:
         var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
+
+    - name: Print env
+      ansible.builtin.command: env
+      register: env_out
+
+    - name: Debug env
+      ansible.builtin.debug:
+        var: env_out.stdout_lines
         
     - name: Start VirtualMachine
       ansible.builtin.uri:
