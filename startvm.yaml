@@ -9,7 +9,7 @@
   tasks:
     - name: print token
       debug:
-        var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
+        var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
 
     - name: Print env
       ansible.builtin.command: env
@@ -24,7 +24,7 @@
         url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/start"
         method: PUT
         headers:
-          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
           Content-Type: "application/json"
         validate_certs: false
         return_content: true
