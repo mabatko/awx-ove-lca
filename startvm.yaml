@@ -4,6 +4,7 @@
   gather_facts: false
   vars:
     vm_namespace: default
+    vm_name: dummy-name
 
   tasks:
     - name: Start VirtualMachine
