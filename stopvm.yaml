@@ -2,14 +2,17 @@
 - name: Stop OpenShift VM
   hosts: localhost
   gather_facts: false
+  vars:
+    vm_namespace: default
+    vm_name: dummy-name
 
-  tasks:
-    - name: Start VirtualMachine
+  tasks:     
+    - name: Stop VirtualMachine
       ansible.builtin.uri:
-        url: "{{ api_endpoint }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/stop"
+        url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/stop"
         method: PUT
         headers:
-          Authorization: "Bearer {{ cso_token }}"
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
           Content-Type: "application/json"
         validate_certs: false
         return_content: true
