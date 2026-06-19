@@ -9,7 +9,7 @@
   tasks:
     - name: print token
       debug:
-        vars: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
+        var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_KEY') }}"
         
     - name: Start VirtualMachine
       ansible.builtin.uri:
