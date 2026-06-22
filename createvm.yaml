@@ -1,0 +1,78 @@
+---
+- name: Create a KubeVirt VM via OpenShift API
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vm_namespace: default
+    vm_name: dummy-name
+    cpu_cores: 2
+    memory_size: "4Gi"
+    disk_size: "25Gi"
+
+  tasks:
+    - name: Submit POST request to KubeVirt API
+      ansible.builtin.uri:
+        url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines"
+        method: POST
+        status_code: [201, 202]
+        validate_certs: false # Set to true if using valid CA certificates
+        headers:
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          apiVersion: "kubevirt.io/v1"
+          kind: "VirtualMachine"
+          metadata:
+            name: "{{ vm_name }}"
+            namespace: "{{ namespace }}"
+          spec:
+            # Set running to true so the VM boots immediately after creation
+            running: true 
+            template:
+              metadata:
+                labels:
+                  kubevirt.io/vm: "{{ vm_name }}"
+              spec:
+                domain:
+                  devices:
+                    disks:
+                      - name: rootdisk
+                        disk:
+                          bus: virtio
+                    interfaces:
+                      - name: default
+                        masquerade: {}
+                  resources:
+                    requests:
+                      cpu: "{{ cpu_cores }}"
+                      memory: "{{ memory_size }}"
+                    limits:
+                      cpu: "{{ cpu_cores }}"
+                      memory: "{{ memory_size }}"
+                networks:
+                  - name: default
+                    pod: {}
+                volumes:
+                  - name: rootdisk
+                    dataVolume:
+                      name: "{{ vm_name }}-rootdisk-dv"
+            dataVolumeTemplates:
+              - metadata:
+                  name: "{{ vm_name }}-rootdisk-dv"
+                spec:
+                  storage:
+                    accessModes:
+                      - ReadWriteOnce
+                    resources:
+                      requests:
+                        storage: "{{ disk_size }}"
+                  # This provisions a blank disk. 
+                  # To use an image instead, replace 'blank: {}' with 'source: { registry: { url: "docker://..." } }'
+                  source:
+                    blank: {}
+      register: api_response
+
+    - name: Debug API Response
+      ansible.builtin.debug:
+        var: api_response.json.metadata.uid
