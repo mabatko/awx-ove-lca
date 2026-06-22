@@ -8,7 +8,7 @@
     os_image: centos-stream10
     cpu_cores: 2
     memory_size: "4Gi"
-    os_disk_size: "25Gi"
+    os_disk_size: "30Gi"
 
   tasks:
     - name: print token
