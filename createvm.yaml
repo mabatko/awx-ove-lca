@@ -5,9 +5,10 @@
   vars:
     vm_namespace: default
     vm_name: dummy-name
+    os_image: centos-stream10
     cpu_cores: 2
     memory_size: "4Gi"
-    disk_size: "25Gi"
+    os_disk_size: "25Gi"
 
   tasks:
     - name: print token
@@ -83,11 +84,15 @@
                       - ReadWriteOnce
                     resources:
                       requests:
-                        storage: "{{ disk_size }}"
+                        storage: "{{ os_disk_size }}"
                   # This provisions a blank disk. 
                   # To use an image instead, replace 'blank: {}' with 'source: { registry: { url: "docker://..." } }'
-                  source:
-                    blank: {}
+                  #source:
+                  #  blank: {}
+                  sourceRef:
+                    kind: DataSource
+                    name: "{{ os_image }}" 
+                    namespace: openshift-virtualization-os-images
       register: api_response
 
     - name: Debug API Response
