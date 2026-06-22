@@ -29,6 +29,7 @@
         return_content: true
         status_code:
           - 200
+          - 201
           - 202
           - 204
         validate_certs: false # Set to true if using valid CA certificates
