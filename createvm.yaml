@@ -37,7 +37,7 @@
           kind: "VirtualMachine"
           metadata:
             name: "{{ vm_name }}"
-            namespace: "{{ namespace }}"
+            namespace: "{{ vm_namespace }}"
           spec:
             # Set running to true so the VM boots immediately after creation
             running: true 
