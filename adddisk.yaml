@@ -22,7 +22,6 @@
       ansible.builtin.debug:
         var: env_out.stdout_lines
         
-  tasks:
     - name: 1. Create the PersistentVolumeClaim (PVC) with specified size
       ansible.builtin.uri:
         url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/api/v1/namespaces/{{ vm_namespace }}/persistentvolumeclaims"
