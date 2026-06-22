@@ -22,11 +22,6 @@
       ansible.builtin.debug:
         var: env_out.stdout_lines
         
-volume_name: "hotplug-volume"
-    pvc_name: "my-additional-disk-pvc"
-    disk_size: "10Gi"
-    storage_class: "gp3-csi"
-
   tasks:
     - name: 1. Create the PersistentVolumeClaim (PVC) with specified size
       ansible.builtin.uri:
