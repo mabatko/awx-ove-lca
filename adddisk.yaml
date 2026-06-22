@@ -41,6 +41,7 @@
           spec:
             accessModes:
               - "ReadWriteOnce"
+            volumeMode: Block
             resources:
               requests:
                 storage: "{{ new_disk_size }}"
