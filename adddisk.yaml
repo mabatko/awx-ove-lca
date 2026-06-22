@@ -1,0 +1,80 @@
+---
+- name: Add disk to OpenShift VM
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vm_namespace: default
+    vm_name: dummy-name
+    new_disk_size: 10Gi
+    pvc_name: dummy-pvc-name
+    volume_name: dummy-volume-name
+
+  tasks:
+    - name: print token
+      debug:
+        var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+
+    - name: Print env
+      ansible.builtin.command: env
+      register: env_out
+
+    - name: Debug env
+      ansible.builtin.debug:
+        var: env_out.stdout_lines
+        
+volume_name: "hotplug-volume"
+    pvc_name: "my-additional-disk-pvc"
+    disk_size: "10Gi"
+    storage_class: "gp3-csi"
+
+  tasks:
+    - name: 1. Create the PersistentVolumeClaim (PVC) with specified size
+      ansible.builtin.uri:
+        url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/api/v1/namespaces/{{ vm_namespace }}/persistentvolumeclaims"
+        method: POST
+        status_code: [201]
+        validate_certs: false
+        headers:
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          apiVersion: "v1"
+          kind: "PersistentVolumeClaim"
+          metadata:
+            name: "{{ pvc_name }}"
+            namespace: "{{ vm_namespace }}"
+          spec:
+            accessModes:
+              - "ReadWriteOnce"
+            resources:
+              requests:
+                storage: "{{ new_disk_size }}"
+      register: pvc_create_result
+
+    - name: 2. Hotplug the created PVC to the running VM using JSON
+      ansible.builtin.uri:
+        url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines/{{ vm_name }}/addvolume"
+        method: PUT
+        status_code: [200, 201, 202]
+        validate_certs: false
+        headers:
+          Authorization: "Bearer {{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          name: "{{ volume_name }}"
+          disk:
+            bus: "virtio"
+          volumeSource:
+            persistentVolumeClaim:
+              claimName: "{{ pvc_name }}"
+      register: disk_add_result
+
+    - name: Show pvc_create result
+      ansible.builtin.debug:
+        var: pvc_create_result
+        
+    - name: Show disk_add result
+      ansible.builtin.debug:
+        var: disk_add_result
