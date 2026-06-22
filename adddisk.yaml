@@ -59,7 +59,8 @@
         body:
           name: "{{ volume_name }}"
           disk:
-            bus: "virtio"
+            disk:
+              bus: "virtio"
           volumeSource:
             persistentVolumeClaim:
               claimName: "{{ pvc_name }}"
