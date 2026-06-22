@@ -61,7 +61,7 @@
           name: "{{ volume_name }}"
           disk:
             disk:
-              bus: "virtio"
+              bus: "scsi"
           volumeSource:
             persistentVolumeClaim:
               claimName: "{{ pvc_name }}"
