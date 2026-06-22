@@ -10,6 +10,18 @@
     disk_size: "25Gi"
 
   tasks:
+    - name: print token
+      debug:
+        var: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+
+    - name: Print env
+      ansible.builtin.command: env
+      register: env_out
+
+    - name: Debug env
+      ansible.builtin.debug:
+        var: env_out.stdout_lines
+        
     - name: Submit POST request to KubeVirt API
       ansible.builtin.uri:
         url: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}/apis/subresources.kubevirt.io/v1/namespaces/{{ vm_namespace }}/virtualmachines"
