@@ -6,7 +6,6 @@
     vm_namespace: default
     vm_name: dummy-name
     new_disk_size: 10Gi
-    pvc_name: dummy-pvc-name
     volume_name: dummy-volume-name
 
   tasks:
@@ -36,7 +35,7 @@
           apiVersion: "v1"
           kind: "PersistentVolumeClaim"
           metadata:
-            name: "{{ pvc_name }}"
+            name: "{{ volume_name }}"
             namespace: "{{ vm_namespace }}"
           spec:
             accessModes:
@@ -64,7 +63,7 @@
               bus: "scsi"
           volumeSource:
             persistentVolumeClaim:
-              claimName: "{{ pvc_name }}"
+              claimName: "{{ volume_name }}"
       register: disk_add_result
 
     - name: Show pvc_create result
